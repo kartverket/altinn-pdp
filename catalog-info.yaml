@@ -35,7 +35,7 @@ metadata:
 spec:
   type: service
   owner: group:default/tilgangsstyring
-  lifecycle: production
+  lifecycle: experimental
   system: system:default/altinn-plattformfunksjonalitet
 
 ---
