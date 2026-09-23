@@ -1,0 +1,51 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: altinn-pdp
+  title: Altinn PDP
+  description: Kotlin-klient og server for utførelse av PDP-oppslag mot Altinn.
+    Klientbibliotek kan brukes av team som selv ønsker å utføre PDP. Server
+    kjøres av Team Tilgangsstyring på SKIP.
+spec:
+  type: ops
+  owner: group:default/tilgangsstyring
+  lifecycle: experimental
+  system: system:default/altinn-plattformfunksjonalitet
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: altinn-pdp-client
+  title: Altinn PDP - Klientbibliotek
+  description: Klientbibliotek for PDP-oppslag mot Altinn
+spec:
+  type: library
+  owner: group:default/tilgangsstyring
+  lifecycle: experimental
+  system: system:default/altinn-plattformfunksjonalitet
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: altinn-pdp-rest-server
+  title: Altinn PDP - REST Server
+  description: Ktor-applikasjon med REST-API for utførelse av PDP-oppslag mot Altinn.
+spec:
+  type: service
+  owner: group:default/tilgangsstyring
+  lifecycle: production
+  system: system:default/altinn-plattformfunksjonalitet
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: altinn-plattformfunksjonalitet
+  title: Altinn Plattformfunksjonalitet
+  description: Støttefunksjonalitet for bruk av Altinn i Kartverket, levert av
+    Team Tilgangsstyring
+spec:
+  type: service
+  owner: group:default/tilgangsstyring
