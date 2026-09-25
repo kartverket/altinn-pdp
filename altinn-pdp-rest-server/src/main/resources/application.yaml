@@ -1,0 +1,10 @@
+altinn:
+  environment: "$ALTINN_ENVIRONMENT:TT02"
+  subscriptionKey: "$ALTINN_SUBSCRIPTION_KEY"
+
+maskinporten:
+  clientId: "$MASKINPORTEN_CLIENT_ID"
+  clientJwk: "$MASKINPORTEN_CLIENT_JWK"
+
+accessLog:
+  enabled: "$?ACCESS_LOG_ENABLED"
