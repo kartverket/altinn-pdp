@@ -52,7 +52,7 @@ fun Application.configureRouting() {
 
         post("/authorize") {
             val pdpClient: PdpClient by dependencies
-            val request = call.receive<AuthorizeRequest>().validated()
+            val request = call.receive<AuthorizeRequest>()
             val authorization = pdpClient.authorize(
                 systemuserId = request.systemuserId,
                 resourceId = request.resourceId,
