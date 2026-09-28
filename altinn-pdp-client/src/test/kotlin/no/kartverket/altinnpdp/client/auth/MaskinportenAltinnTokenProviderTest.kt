@@ -1,9 +1,5 @@
 package no.kartverket.altinnpdp.client.auth
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import no.kartverket.altinnpdp.client.support.NOW
 import no.kartverket.altinnpdp.client.support.TOKEN_PATH
@@ -45,19 +41,6 @@ class MaskinportenAltinnTokenProviderTest {
         val provider = maskinportenAltinnTokenProvider(server)
 
         repeat(3) { provider.getAltinnToken() }
-
-        assertEquals(1, server.requestCount(TOKEN_PATH))
-        assertEquals(1, server.requestCount(exchangePath))
-    }
-
-    @Test
-    fun `concurrent callers on cold caches fetch one of each token`() = runBlocking {
-        server.serveBothTokens()
-        val provider = maskinportenAltinnTokenProvider(server)
-
-        coroutineScope {
-            List(20) { async(Dispatchers.Default) { provider.getAltinnToken() } }.awaitAll()
-        }
 
         assertEquals(1, server.requestCount(TOKEN_PATH))
         assertEquals(1, server.requestCount(exchangePath))

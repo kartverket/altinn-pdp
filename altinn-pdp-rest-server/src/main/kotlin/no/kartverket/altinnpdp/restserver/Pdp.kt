@@ -33,5 +33,5 @@ private fun Application.pdpClientFromConfig(): PdpClient {
     )
 }
 
-internal val CONNECT_TIMEOUT: Duration = Duration.ofSeconds(2)
-internal val REQUEST_TIMEOUT: Duration = Duration.ofSeconds(3)
+private val CONNECT_TIMEOUT: Duration = Duration.ofSeconds(2)
+private val REQUEST_TIMEOUT: Duration = Duration.ofSeconds(3)

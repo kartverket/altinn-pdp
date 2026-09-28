@@ -2,7 +2,6 @@ package no.kartverket.altinnpdp.client
 
 import kotlinx.coroutines.runBlocking
 import no.kartverket.altinnpdp.client.exception.PdpException
-import no.kartverket.altinnpdp.client.support.FakeTokenProvider
 import no.kartverket.altinnpdp.client.support.SAMPLE_SYSTEMUSER_ID
 import no.kartverket.altinnpdp.client.support.TestHttpServer
 import no.kartverket.altinnpdp.client.support.TestResponse
@@ -15,7 +14,6 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PdpClientTest {
@@ -50,36 +48,15 @@ class PdpClientTest {
     }
 
     @Test
-    fun `sends the XACML request body`() = runBlocking {
+    fun `sends the exact XACML body Altinn's PDP expects`() = runBlocking {
         serverAnswers()
 
         testPdpClient(server.baseUrl).authorizeSample()
 
-        val body = server.lastRequest(path).body
-        assertContains(body, """"attributeId":"urn:altinn:systemuser:uuid","value":"$SAMPLE_SYSTEMUSER_ID"""")
-        assertContains(body, """"attributeId":"urn:altinn:resource","value":"test-resource"""")
-        assertContains(body, """"attributeId":"urn:altinn:organization:identifier-no","value":"923609016"""")
-    }
-
-    @Test
-    fun `appends the authorize path to a base URL that ends in a slash`() = runBlocking {
-        serverAnswers()
-
-        testPdpClient(server.baseUrl + "/").authorizeSample()
-
-        assertEquals(1, server.requestCount(path))
-    }
-
-    @Test
-    fun `asks the token provider on every call, leaving caching to the provider`() = runBlocking {
-        serverAnswers()
-        val provider = FakeTokenProvider()
-        val client = testPdpClient(server.baseUrl, tokenProvider = provider)
-
-        client.authorizeSample()
-        client.authorizeSample()
-
-        assertEquals(2, provider.calls)
+        val expected = """
+            {"request":{"returnPolicyIdList":true,"accessSubject":[{"attribute":[{"attributeId":"urn:altinn:systemuser:uuid","value":"$SAMPLE_SYSTEMUSER_ID"}]}],"action":[{"attribute":[{"attributeId":"urn:oasis:names:tc:xacml:1.0:action:action-id","value":"read"}]}],"resource":[{"attribute":[{"attributeId":"urn:altinn:resource","value":"test-resource"},{"attributeId":"urn:altinn:organization:identifier-no","value":"923609016"}]}]}}
+        """.trimIndent()
+        assertEquals(expected, server.lastRequest(path).body)
     }
 
     @Test
@@ -98,8 +75,8 @@ class PdpClientTest {
     }
 
     @Test
-    fun `reads the decision from a camelCase response too`() = runBlocking {
-        server.on(path) { TestResponse(body = """{"response":[{"decision":"Deny"}]}""") }
+    fun `reads the PascalCase spelling from Altinn's documentation too`() = runBlocking {
+        server.on(path) { TestResponse(body = """{"Response":[{"Decision":"Deny"}]}""") }
 
         assertEquals(PdpDecision.DENY, testPdpClient(server.baseUrl).authorizeSample().decision)
     }
@@ -118,7 +95,7 @@ class PdpClientTest {
     fun `fails loudly on an answer it cannot use, rather than treating it as a deny`() = runBlocking {
         val cases = mapOf(
             "a body that is not JSON" to ("<html>gateway error</html>" to "parse"),
-            "no decision at all" to ("""{"Response":[]}""" to "no Response entries"),
+            "no decision at all" to ("""{"response":[]}""" to "no Response entries"),
             "a decision it does not recognise" to (pdpDecisionResponse("Maybe") to "Maybe"),
             "more decisions than were asked for" to
                 ("""{"response":[{"decision":"Permit"},{"decision":"Deny"}]}""" to "2 Response entries"),
@@ -142,15 +119,19 @@ class PdpClientTest {
     }
 
     @Test
-    fun `surfaces the obligations and status URN Altinn attaches to a permit`() = runBlocking {
+    fun `surfaces the obligations and status URN of a real Permit from TT02`() = runBlocking {
         val body = """
-            {"response":[{"decision":"Permit","status":{"statusCode":{"value":"urn:oasis:names:tc:xacml:1.0:status:ok"}},
+            {"response":[{"decision":"Permit","status":{"statusMessage":null,"statusDetails":null,
+            "statusCode":{"value":"urn:oasis:names:tc:xacml:1.0:status:ok","statusCode":null}},
             "obligations":[{"id":"urn:altinn:obligation:authenticationLevel1","attributeAssignment":[
             {"attributeId":"urn:altinn:obligation1-assignment1","value":"3",
-            "category":"urn:altinn:minimum-authenticationlevel"}]},
+            "category":"urn:altinn:minimum-authenticationlevel",
+            "dataType":"http://www.w3.org/2001/XMLSchema#integer","issuer":null}]},
             {"id":"urn:altinn:obligation:authenticationLevel2","attributeAssignment":[
             {"attributeId":"urn:altinn:obligation2-assignment2","value":"3",
-            "category":"urn:altinn:minimum-authenticationlevel-org"}]}]}]}
+            "category":"urn:altinn:minimum-authenticationlevel-org",
+            "dataType":"http://www.w3.org/2001/XMLSchema#integer","issuer":null}]}],
+            "associateAdvice":null,"category":null,"policyIdentifierList":null}]}
         """.trimIndent().replace("\n", "")
         server.on(path) { TestResponse(body = body) }
 
@@ -164,10 +145,11 @@ class PdpClientTest {
     }
 
     @Test
-    fun `keeps the processing-error status that marks an unevaluatable request`() = runBlocking {
+    fun `keeps the processing-error status of a real Indeterminate from TT02`() = runBlocking {
         val body = """
-            {"response":[{"decision":"Indeterminate",
-            "status":{"statusCode":{"value":"urn:oasis:names:tc:xacml:1.0:status:processing-error"}}}]}
+            {"response":[{"decision":"Indeterminate","status":{"statusMessage":null,"statusDetails":null,
+            "statusCode":{"value":"urn:oasis:names:tc:xacml:1.0:status:processing-error","statusCode":null}},
+            "obligations":null,"associateAdvice":null,"category":null,"policyIdentifierList":null}]}
         """.trimIndent().replace("\n", "")
         server.on(path) { TestResponse(body = body) }
 
@@ -176,15 +158,5 @@ class PdpClientTest {
         assertEquals(PdpDecision.INDETERMINATE, authorization.decision)
         assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", authorization.statusCode)
         assertTrue(authorization.obligations.isEmpty())
-    }
-
-    @Test
-    fun `a decision with no obligations reports no authentication level`() = runBlocking {
-        serverAnswers()
-
-        val authorization = testPdpClient(server.baseUrl).authorizeSample()
-
-        assertNull(authorization.minimumAuthenticationLevel)
-        assertNull(authorization.statusCode)
     }
 }

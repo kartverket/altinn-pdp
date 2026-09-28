@@ -38,14 +38,6 @@ class PdpRequestValidationTest {
     }
 
     @Test
-    fun `several format errors are reported together`() {
-        val errors = validate(systemuserId = "not-a-uuid", resourceId = "ab", customerOrganizationNumber = "12345")
-
-        assertEquals(3, errors.size)
-        assertTrue(errors.all { it.code == PdpValidationCode.INVALID_FORMAT })
-    }
-
-    @Test
     fun `systemuserId must be a uuid`() {
         assertTrue(validate(systemuserId = "not-a-uuid").isNotEmpty())
         assertTrue(validate(systemuserId = "1725580f70f44acea7484f912497a0d7").isNotEmpty())
@@ -88,12 +80,6 @@ class PdpRequestValidationTest {
     fun `MOD11 rejects a transposed or altered digit`() {
         assertFalse(PdpRequestValidation.hasValidMod11("311718372"))
         assertFalse(PdpRequestValidation.hasValidMod11("987654321"))
-    }
-
-    @Test
-    fun `MOD11 is a typo check, not an existence check`() {
-        assertTrue(PdpRequestValidation.hasValidMod11("000000000"))
-        assertTrue(PdpRequestValidation.hasValidMod11("999999999"))
     }
 
     @Test

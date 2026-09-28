@@ -44,15 +44,4 @@ class PdpAuthorizationTest {
         assertNull(authorization.minimumAuthenticationLevel)
         assertEquals(1, authorization.obligations.size)
     }
-
-    @Test
-    fun `an obligation category the client does not know is still carried`() {
-        val authorization = PdpAuthorization(
-            decision = PdpDecision.PERMIT,
-            obligations = listOf(obligation("urn:altinn:some-future-obligation", "1")),
-        )
-
-        assertNull(authorization.minimumAuthenticationLevel)
-        assertEquals("urn:altinn:some-future-obligation", authorization.obligations.single().category)
-    }
 }

@@ -29,6 +29,13 @@ class ConfigTest {
     }
 
     @Test
+    fun `a flag must be true or false`() {
+        val e = assertFailsWith<IllegalStateException> { MapApplicationConfig("flag" to "yes").boolean("flag", default = true) }
+
+        assertContains(e.message!!, "must be true or false")
+    }
+
+    @Test
     fun `a blank required value counts as missing`() {
         val e = assertFailsWith<IllegalStateException> { MapApplicationConfig("key" to "   ").required("key") }
 

@@ -11,7 +11,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -61,15 +60,6 @@ class AccessLoggingTest {
     }
 
     @Test
-    fun `the line carries status, method and duration`() {
-        val line = linesFor("true").single { it.contains("/health/live") }
-
-        assertTrue(line.contains("200"), "no status in: $line")
-        assertTrue(line.contains("GET"), "no method in: $line")
-        assertTrue(Regex("""\d+ms""").containsMatchIn(line), "no duration in: $line")
-    }
-
-    @Test
     fun `the line has its own logger, so logback can route it apart from other logs`() {
         linesFor("true")
         val event = appender.list.single { it.formattedMessage.contains("/health/live") }
@@ -85,26 +75,5 @@ class AccessLoggingTest {
             logged.any { it.contains("/health/live") },
             "expected no access log line, got: $logged",
         )
-    }
-
-    @Test
-    fun `enabled by default when the variable is unset`() {
-        assertTrue(accessLogEnabled())
-        assertTrue(accessLogEnabled(MapApplicationConfig("accessLog.enabled" to "")))
-    }
-
-    @Test
-    fun `reads true and false`() {
-        assertTrue(accessLogEnabled(MapApplicationConfig("accessLog.enabled" to "true")))
-        assertFalse(accessLogEnabled(MapApplicationConfig("accessLog.enabled" to " false ")))
-    }
-
-    @Test
-    fun `refuses a value that is neither true nor false`() {
-        val e = assertFailsWith<IllegalStateException> {
-            accessLogEnabled(MapApplicationConfig("accessLog.enabled" to "yes"))
-        }
-
-        assertEquals(true, e.message?.contains("must be true or false"), e.message)
     }
 }

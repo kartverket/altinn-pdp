@@ -9,7 +9,7 @@ internal object Http {
 
     val json = Json { ignoreUnknownKeys = true }
 
-    fun url(baseUrl: String, path: String): URI = URI.create(baseUrl.removeSuffix("/") + path)
+    fun url(baseUrl: String, path: String): URI = URI.create(baseUrl + path)
 
     suspend fun sendExpectingOk(
         httpClient: PdpHttpClient,

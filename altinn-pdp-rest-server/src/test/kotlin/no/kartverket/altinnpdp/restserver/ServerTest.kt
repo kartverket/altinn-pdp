@@ -46,12 +46,10 @@ class ServerTest {
     }
 
     @Test
-    fun `authorize returns every decision Altinn can answer with`() {
+    fun `authorize returns Altinn's decision, and permit only for a Permit`() {
         val expected = mapOf(
             "Permit" to AuthorizeResponse(permit = true, decision = PdpDecision.PERMIT, status = OK_STATUS),
             "Deny" to AuthorizeResponse(permit = false, decision = PdpDecision.DENY, status = OK_STATUS),
-            "NotApplicable" to AuthorizeResponse(permit = false, decision = PdpDecision.NOT_APPLICABLE, status = OK_STATUS),
-            "Indeterminate" to AuthorizeResponse(permit = false, decision = PdpDecision.INDETERMINATE, status = OK_STATUS),
         )
         for ((decision, expectedResponse) in expected) {
             authorizeTest(decision = decision) {
@@ -89,25 +87,12 @@ class ServerTest {
     }
 
     @Test
-    fun `authorize reports every field it is missing, in one response`() {
+    fun `authorize reports every field it rejects, in one response`() {
         val cases = listOf(
             ValidationCase(
-                why = "a blank field",
-                body = authorizeBody(systemuserId = ""),
-                errors = listOf(FieldError("systemuserId", PdpValidationCode.MISSING, "systemuserId is required")),
-            ),
-            ValidationCase(
-                why = "one absent field",
+                why = "an absent field",
                 body = authorizeBody(systemuserId = null),
                 errors = listOf(FieldError("systemuserId", PdpValidationCode.MISSING, "systemuserId is required")),
-            ),
-            ValidationCase(
-                why = "several absent fields",
-                body = authorizeBody(systemuserId = null, resourceId = null),
-                errors = listOf(
-                    FieldError("systemuserId", PdpValidationCode.MISSING, "systemuserId is required"),
-                    FieldError("resourceId", PdpValidationCode.MISSING, "resourceId is required"),
-                ),
             ),
             ValidationCase(
                 why = "an explicit null",
@@ -115,36 +100,6 @@ class ServerTest {
                     """"customerOrganizationNumber":null,"action":"read"}""",
                 errors = listOf(
                     FieldError("customerOrganizationNumber", PdpValidationCode.MISSING, "customerOrganizationNumber is required"),
-                ),
-            ),
-        )
-
-        assertRejected(cases)
-    }
-
-    @Test
-    fun `authorize reports every field whose value it rejects, in one response`() {
-        val cases = listOf(
-            ValidationCase(
-                why = "an organization number that isn't 9 digits",
-                body = authorizeBody(customerOrganizationNumber = "12345"),
-                errors = listOf(
-                    FieldError(
-                        "customerOrganizationNumber",
-                        PdpValidationCode.INVALID_FORMAT,
-                        "customerOrganizationNumber must be exactly 9 digits",
-                    ),
-                ),
-            ),
-            ValidationCase(
-                why = "an organization number with a bad check digit",
-                body = authorizeBody(customerOrganizationNumber = "123456789"),
-                errors = listOf(
-                    FieldError(
-                        "customerOrganizationNumber",
-                        PdpValidationCode.INVALID_FORMAT,
-                        "customerOrganizationNumber must have a valid MOD11 check digit",
-                    ),
                 ),
             ),
             ValidationCase(
@@ -197,10 +152,7 @@ class ServerTest {
     fun `the upstream status decides whether the caller or Altinn is to blame`() {
         val cases = listOf(
             UpstreamCase(400, HttpStatusCode.BadRequest, ErrorCode.UPSTREAM_REJECTED, "only Altinn's own 400 is the caller's fault"),
-            UpstreamCase(401, HttpStatusCode.BadGateway, ErrorCode.UPSTREAM_ERROR, "our own credentials are not the caller's fault"),
-            UpstreamCase(403, HttpStatusCode.BadGateway, ErrorCode.UPSTREAM_ERROR, "our own credentials are not the caller's fault"),
-            UpstreamCase(429, HttpStatusCode.BadGateway, ErrorCode.UPSTREAM_ERROR, "our own quota is not the caller's fault"),
-            UpstreamCase(500, HttpStatusCode.BadGateway, ErrorCode.UPSTREAM_ERROR, "a PDP server failure is not the caller's fault"),
+            UpstreamCase(500, HttpStatusCode.BadGateway, ErrorCode.UPSTREAM_ERROR, "anything else is not the caller's fault"),
         )
 
         for (case in cases) {

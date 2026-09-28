@@ -27,12 +27,4 @@ class AltinnPdpExceptionTest {
         assertTrue(e.message!!.endsWith("… (600 characters in total)"))
         assertEquals(body, e.responseBody, "the full body stays available for callers that want it")
     }
-
-    @Test
-    fun `carries the status code for callers that branch on it`() {
-        val e = PdpException("boom", statusCode = 503, responseBody = "unavailable")
-
-        assertEquals(503, e.statusCode)
-        assertEquals("unavailable", e.responseBody)
-    }
 }

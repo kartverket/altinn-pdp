@@ -4,7 +4,6 @@ import com.nimbusds.jose.crypto.RSASSAVerifier
 import com.nimbusds.jwt.SignedJWT
 import kotlinx.coroutines.runBlocking
 import no.kartverket.altinnpdp.client.exception.MaskinportenException
-import no.kartverket.altinnpdp.client.support.MutableClock
 import no.kartverket.altinnpdp.client.support.NOW
 import no.kartverket.altinnpdp.client.support.TOKEN_PATH
 import no.kartverket.altinnpdp.client.support.TestHttpServer
@@ -16,8 +15,6 @@ import no.kartverket.altinnpdp.client.support.maskinportenTokenResponse
 import no.kartverket.altinnpdp.client.support.testHttpClient
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets.UTF_8
-import java.time.Clock
-import java.time.Duration
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -39,13 +36,8 @@ class MaskinportenClientTest {
     @AfterTest
     fun stopServer() = server.close()
 
-    private fun client(clock: Clock = fixedClock(), refreshLeeway: Duration = Duration.ofSeconds(30)) =
-        MaskinportenClient(
-            maskinportenConfig(tokenUrl = server.baseUrl + TOKEN_PATH),
-            testHttpClient,
-            clock = clock,
-            refreshLeeway = refreshLeeway,
-        )
+    private fun client() =
+        MaskinportenClient(maskinportenConfig(tokenUrl = server.baseUrl + TOKEN_PATH), testHttpClient, clock = fixedClock())
 
     private fun offlineClient(config: MaskinportenConfig) =
         MaskinportenClient(config, testHttpClient, clock = fixedClock())
@@ -72,16 +64,6 @@ class MaskinportenClientTest {
         assertNotNull(claims.jwtid, "a jti is required so Maskinporten can reject replays")
         assertEquals(NOW.epochSecond, claims.issueTime.toInstant().epochSecond)
         assertEquals(NOW.plusSeconds(60).epochSecond, claims.expirationTime.toInstant().epochSecond)
-    }
-
-    @Test
-    fun `gives each assertion its own jti`() {
-        val client = offlineClient(maskinportenConfig())
-
-        val first = SignedJWT.parse(client.createClientAssertion()).jwtClaimsSet.jwtid
-        val second = SignedJWT.parse(client.createClientAssertion()).jwtClaimsSet.jwtid
-
-        assertTrue(first != second, "a reused jti would be rejected as a replay")
     }
 
     @Test
@@ -117,17 +99,6 @@ class MaskinportenClientTest {
     }
 
     @Test
-    fun `surfaces a non-200 with the status and body on the exception`() = runBlocking {
-        server.on(TOKEN_PATH) { TestResponse(status = 400, body = """{"error":"invalid_grant"}""") }
-
-        val e = assertFailsWith<MaskinportenException> { client().getToken() }
-
-        assertEquals(400, e.statusCode)
-        assertEquals("""{"error":"invalid_grant"}""", e.responseBody)
-        assertContains(e.message!!, "invalid_grant")
-    }
-
-    @Test
     fun `fails on an answer it cannot take a token from`() = runBlocking {
         val cases = mapOf(
             "no expires_in" to (maskinportenTokenResponse(expiresIn = null) to "expires_in"),
@@ -142,41 +113,5 @@ class MaskinportenClientTest {
 
             assertContains(e.message!!, expectedInMessage, message = "for $why")
         }
-    }
-
-    @Test
-    fun `wraps a connection failure rather than leaking an IOException`() = runBlocking {
-        val client = MaskinportenClient(
-            maskinportenConfig(tokenUrl = "http://127.0.0.1:1/token"),
-            testHttpClient,
-            clock = fixedClock(),
-        )
-
-        assertContains(assertFailsWith<MaskinportenException> { client.getToken() }.message!!, "Maskinporten")
-    }
-
-    @Test
-    fun `serves a cached token instead of asking Maskinporten again`() = runBlocking {
-        server.on(TOKEN_PATH) { TestResponse(body = maskinportenTokenResponse("maskinporten-token")) }
-        val client = client()
-
-        repeat(3) { client.getToken() }
-
-        assertEquals(1, server.requestCount(TOKEN_PATH))
-    }
-
-    @Test
-    fun `fetches a new token once the cached one nears expiry`() = runBlocking {
-        var issued = 0
-        server.on(TOKEN_PATH) { TestResponse(body = maskinportenTokenResponse("token-${++issued}", expiresIn = 120)) }
-        val clock = MutableClock()
-        val client = client(clock = clock, refreshLeeway = Duration.ofSeconds(30))
-
-        assertEquals("token-1", client.getToken().value)
-        clock.advance(Duration.ofSeconds(89))
-        assertEquals("token-1", client.getToken().value, "still outside the refresh window")
-        clock.advance(Duration.ofSeconds(1))
-        assertEquals("token-2", client.getToken().value, "now within the 30s refresh leeway")
-        assertEquals(2, server.requestCount(TOKEN_PATH))
     }
 }

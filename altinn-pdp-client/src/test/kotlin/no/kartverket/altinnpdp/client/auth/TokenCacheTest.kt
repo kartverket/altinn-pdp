@@ -54,7 +54,7 @@ class TokenCacheTest {
                 async(Dispatchers.Default) {
                     cache.get {
                         loads.incrementAndGet()
-                        delay(20) // hold the lock long enough for the race to be real
+                        delay(20)
                         AltinnToken("t", NOW.plusSeconds(300))
                     }
                 }

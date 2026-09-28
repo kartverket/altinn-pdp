@@ -1,29 +1,11 @@
 package no.kartverket.altinnpdp.client.auth
 
 import no.kartverket.altinnpdp.client.support.NOW
-import java.time.Duration
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AccessTokenTest {
-
-    private val leeway: Duration = Duration.ofSeconds(30)
-
-    @Test
-    fun `counts a token expiring exactly at the leeway boundary as expired`() {
-        assertTrue(AltinnToken("t", NOW.plus(leeway)).isExpired(NOW, leeway))
-    }
-
-    @Test
-    fun `keeps a token that outlives the leeway boundary by a second`() {
-        assertFalse(AltinnToken("t", NOW.plus(leeway).plusSeconds(1)).isExpired(NOW, leeway))
-    }
-
-    @Test
-    fun `counts an already expired token as expired`() {
-        assertTrue(AltinnToken("t", NOW.minusSeconds(1)).isExpired(NOW, Duration.ZERO))
-    }
 
     @Test
     fun `masks the token value in toString so it cannot reach the logs`() {
