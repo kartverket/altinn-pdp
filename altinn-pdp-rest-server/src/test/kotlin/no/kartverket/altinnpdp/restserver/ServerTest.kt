@@ -8,7 +8,6 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import no.kartverket.altinnpdp.client.PdpDecision
 import no.kartverket.altinnpdp.client.validation.PdpValidationCode
 import no.kartverket.altinnpdp.restserver.models.AuthorizeResponse
@@ -31,7 +30,7 @@ class ServerTest {
     }
 
     @Test
-    fun `openapi endpoint serves the spec as json from the classpath`() = testApplication {
+    fun `openapi endpoint serves the generated spec as json`() = testApplication {
         application {
             configureRouting()
         }
@@ -40,7 +39,6 @@ class ServerTest {
         assertEquals(ContentType.Application.Json, response.contentType()?.withoutParameters())
 
         val spec = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals("3.0.3", spec.getValue("openapi").jsonPrimitive.content)
         assertTrue(spec.getValue("paths").jsonObject.containsKey("/authorize"))
         assertFalse(spec.containsKey("servers"), "the host differs per environment, so the spec names none")
     }

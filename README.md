@@ -283,6 +283,20 @@ Per-field `code` is `MISSING` (absent, null or blank) or `INVALID_FORMAT` (prese
 Liveness probe. Returns `200 OK` with an empty body if the server is up - not part of the stable
 API.
 
+### `GET /openapi`
+
+The OpenAPI spec as JSON, built from the routes themselves so it cannot describe an API the server
+does not serve. It names no `servers`, so a client uses the host it fetched the spec from.
+
+The same spec is checked in as `altinn-pdp-rest-server/openapi.json` for anyone who needs it
+without running the server. Regenerate it after changing the API:
+
+```bash
+./gradlew :altinn-pdp-rest-server:generateOpenApiSpec
+```
+
+The build fails if the checked-in file is stale, so there is no way to forget.
+
 ---
 
 ## 🔑 Environment variables
