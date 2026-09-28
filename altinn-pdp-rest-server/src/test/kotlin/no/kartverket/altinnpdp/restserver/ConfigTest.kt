@@ -2,6 +2,7 @@ package no.kartverket.altinnpdp.restserver
 
 import io.ktor.server.config.MapApplicationConfig
 import no.kartverket.altinnpdp.client.AltinnEnvironment
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -43,5 +44,29 @@ class ConfigTest {
 
             assertContains(e.message!!, "server.port", message = raw)
         }
+    }
+
+    @Test
+    fun `loads the application config from the given file`() {
+        val file = File.createTempFile("application", ".yaml").apply { deleteOnExit() }
+        file.writeText("server:\n  port: \"9090\"\n")
+
+        assertEquals(9090, loadApplicationConfig(file.path).port("server.port"))
+    }
+
+    @Test
+    fun `refuses an application config path that is not a file`() {
+        val e = assertFailsWith<IllegalStateException> { loadApplicationConfig("/no/such/application.yaml") }
+
+        assertContains(e.message!!, "/no/such/application.yaml")
+    }
+
+    @Test
+    fun `refuses an application config file that is not yaml`() {
+        val file = File.createTempFile("application", ".conf").apply { deleteOnExit() }
+
+        val e = assertFailsWith<IllegalStateException> { loadApplicationConfig(file.path) }
+
+        assertContains(e.message!!, ".yaml or .yml")
     }
 }

@@ -1,6 +1,21 @@
 package no.kartverket.altinnpdp.restserver
 
 import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.config.yaml.YamlConfig
+import java.io.File
+
+internal fun loadApplicationConfig(
+    configFile: String? = System.getProperty("APPLICATION_CONFIG_FILE") ?: System.getenv("APPLICATION_CONFIG_FILE"),
+): ApplicationConfig {
+    val path = configFile?.trim()?.takeIf { it.isNotEmpty() }
+        ?: return YamlConfig("application.yaml") ?: error("application.yaml is not on the classpath")
+    val file = File(path)
+    check(file.isFile) { "APPLICATION_CONFIG_FILE must point to a file, but was \"$path\" (see .env.example)" }
+    check(file.extension in setOf("yaml", "yml")) {
+        "APPLICATION_CONFIG_FILE must end in .yaml or .yml, but was \"$path\" (see .env.example)"
+    }
+    return checkNotNull(YamlConfig(file.absolutePath))
+}
 
 internal fun ApplicationConfig.optional(path: String): String? =
     propertyOrNull(path)?.getString()?.trim()?.takeIf { it.isNotEmpty() }

@@ -3,7 +3,6 @@ package no.kartverket.altinnpdp.restserver
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.config.yaml.YamlConfig
 import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
@@ -20,7 +19,7 @@ import no.kartverket.altinnpdp.restserver.models.AuthorizeRequest
 import no.kartverket.altinnpdp.restserver.models.AuthorizeResponse
 
 fun main() {
-    val config = YamlConfig("application.yaml") ?: error("application.yaml is not on the classpath")
+    val config = loadApplicationConfig()
     logbackConfigFile(config)?.let { System.setProperty("logback.configurationFile", it) }
     embeddedServer(
         Netty,
