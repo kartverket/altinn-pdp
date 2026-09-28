@@ -86,7 +86,7 @@ private val authorizeRequestSchema = schemaInference.jsonSchema<AuthorizeRequest
         copy(
             type = JsonType.STRING,
             format = "uuid",
-            description = "The systembruker id from the token's authorization_details. Always a UUID.",
+            description = "The system user id from the token's authorization_details. Always a UUID.",
         )
     },
     "resourceId" to {
@@ -102,7 +102,7 @@ private val authorizeRequestSchema = schemaInference.jsonSchema<AuthorizeRequest
             type = JsonType.STRING,
             pattern = PdpRequestValidation.ORGANIZATION_NUMBER_FORMAT.pattern,
             description = "Plain Norwegian org number (exactly 9 digits, with a valid MOD11 check digit) of the " +
-                "customer the systembruker acts on behalf of, e.g. \"923609016\". In the Maskinporten token this " +
+                "customer the system user acts on behalf of, e.g. \"923609016\". In the Maskinporten token this " +
                 "is authorization_details[].systemuser_org, NOT the consumer claim, which is the vendor's own org " +
                 "number. Strip the ISO6523 prefix: send \"311718371\", not \"0192:311718371\".",
         )
@@ -163,8 +163,8 @@ internal val healthLiveOperation: Operation.Builder.() -> Unit = {
 }
 
 internal val authorizeOperation: Operation.Builder.() -> Unit = {
-    summary = "Check whether a systembruker is authorized"
-    description = "Asks the Altinn PDP whether the systembruker identified by [systemuserId] has been delegated " +
+    summary = "Check whether a system user is authorized"
+    description = "Asks the Altinn PDP whether the system user identified by [systemuserId] has been delegated " +
         "[action] on [resourceId] for the customer identified by [customerOrganizationNumber]. The Altinn " +
         "subscription key and Maskinporten token are configured server-side; the caller never supplies them."
 

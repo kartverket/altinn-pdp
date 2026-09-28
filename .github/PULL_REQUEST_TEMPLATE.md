@@ -1,14 +1,14 @@
-## Beskrivelse
+## Description
 
-_Hva gjelder denne PR-en, og hvorfor er endringen nødvendig?_
+_What is this PR about, and why is the change needed?_
 
-## Løsning
+## Solution
 
-_Hvordan er problemet løst? Beskriv endringene._
+_How is the problem solved? Describe the changes._
 
-## Sjekkliste
+## Checklist
 
-_Skal utføres før den markeres som klar for review._
+_To be done before it is marked ready for review._
 
-- [ ] README er oppdatert ved behov
-- [ ] Tester er lagt til/oppdatert ved behov
+- [ ] README is updated where needed
+- [ ] Tests are added/updated where needed

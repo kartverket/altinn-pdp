@@ -2,7 +2,7 @@
 
 # 🗝️ Fleks · Altinn PDP
 
-**Kotlin library and REST service for asking Altinn whether a systembruker has access to a resource.**
+**Kotlin library and REST service for asking Altinn whether a system user has access to a resource.**
 
 <br/>
 
@@ -38,18 +38,18 @@
 
 ## 🎯 About the project
 
-A valid Maskinporten token proves that a systembruker belongs to the calling system. It does not
-prove that the systembruker was ever granted access to any particular resource. There is
+A valid Maskinporten token proves that a system user belongs to the calling system. It does not
+prove that the system user was ever granted access to any particular resource. There is
 deliberately no link between the Maskinporten scope and the Altinn resource, so an API that only
 validates the token has answered half the question.
 
-The other half is a **PDP-oppslag**: asking Altinn's Policy Decision Point whether this
-systembruker may act on behalf of this organisation, on this resource, in this way. That is what
+The other half is a **PDP lookup**: asking Altinn's Policy Decision Point whether this
+system user may act on behalf of this organisation, on this resource, in this way. That is what
 this project is for.
 
 > [!NOTE]
 > A Kartverket API therefore makes two independent checks: it validates the token's scope itself,
-> **and** it performs a PDP-oppslag. Neither one replaces the other.
+> **and** it performs a PDP lookup. Neither one replaces the other.
 
 ---
 
@@ -102,7 +102,7 @@ fetched again shortly before they expire, and it is safe to call from several co
 
 ```kotlin
 val authorization = client.authorize(
-    systemuserId = SystemUserId.parse("<systembruker uuid>"),
+    systemuserId = SystemUserId.parse("<system user uuid>"),
     resourceId = ResourceId.parse("<resource id>"),
     customerOrganizationNumber = OrganizationNumber.parse("923609016"),
     action = ActionId.parse("read"),
@@ -125,7 +125,7 @@ The answer is a `PdpAuthorization`:
 > [Authentication level obligations](#authentication-level-obligations).
 
 > [!IMPORTANT]
-> This is the org number of the customer the systembruker acts **on behalf of**, not your own.
+> This is the org number of the customer the system user acts **on behalf of**, not your own.
 > In the Maskinporten token it is `authorization_details[].systemuser_org`. It is **not** the
 > `consumer` claim, which holds the vendor's org number. Strip the ISO6523 prefix: send
 > `311718371`, not `0192:311718371`.
@@ -174,7 +174,7 @@ Request body:
 
 ```json
 {
-  "systemuserId": "<systembruker id from the token's authorization_details>",
+  "systemuserId": "<system user id from the token's authorization_details>",
   "resourceId": "<resource identifier in the Altinn Resource Registry>",
   "customerOrganizationNumber": "923609016",
   "action": "read"
@@ -183,7 +183,7 @@ Request body:
 
 All four fields are required strings, and are validated before Altinn is called:
 
-| Felt                         | Regel                                                |
+| Field                        | Rule                                                 |
 | :--------------------------- | :--------------------------------------------------- |
 | `systemuserId`               | UUID                                                 |
 | `resourceId`                 | `^[a-z0-9_-]{4,}$`, the Resource Registry's own rule |
@@ -215,12 +215,12 @@ Altinn sends nothing for them, so a response may still be just `permit` and `dec
 
 `decision` is one of:
 
-| Value            | Meaning                                                                      |
-| :--------------- | :--------------------------------------------------------------------------- |
-| `PERMIT`         | The systembruker is allowed to perform `action` on the resource for that org |
-| `DENY`           | Explicitly denied                                                            |
-| `NOT_APPLICABLE` | No matching policy - not necessarily an error                                |
-| `INDETERMINATE`  | The PDP couldn't evaluate the request                                        |
+| Value            | Meaning                                                                     |
+| :--------------- | :-------------------------------------------------------------------------- |
+| `PERMIT`         | The system user is allowed to perform `action` on the resource for that org |
+| `DENY`           | Explicitly denied                                                           |
+| `NOT_APPLICABLE` | No matching policy - not necessarily an error                               |
+| `INDETERMINATE`  | The PDP couldn't evaluate the request                                       |
 
 #### Authentication level obligations
 
@@ -367,17 +367,17 @@ them differently, from the rest:
 
 ## 🔗 Useful links
 
-| Resource                         | Link                                                                                    |
-| :------------------------------- | :-------------------------------------------------------------------------------------- |
-| Authorising a systembruker       | https://docs.altinn.studio/nb/authorization/guides/resource-owner/system-user/          |
-| Altinn Studio documentation      | https://docs.altinn.studio                                                              |
-| Altinn-delegering i Maskinporten | https://skip.kartverket.no/docs/tilgangsstyring/valg-av-identitetstilbyder/delegering   |
-| Systembruker                     | https://skip.kartverket.no/docs/tilgangsstyring/valg-av-identitetstilbyder/systembruker |
-| Maskinporten                     | https://docs.digdir.no/docs/Maskinporten                                                |
-| Altinn TT02 (test)               | https://tt02.altinn.no                                                                  |
+| Resource                          | Link                                                                                    |
+| :-------------------------------- | :-------------------------------------------------------------------------------------- |
+| Authorising a system user         | https://docs.altinn.studio/nb/authorization/guides/resource-owner/system-user/          |
+| Altinn Studio documentation       | https://docs.altinn.studio                                                              |
+| Altinn delegation in Maskinporten | https://skip.kartverket.no/docs/tilgangsstyring/valg-av-identitetstilbyder/delegering   |
+| System user                       | https://skip.kartverket.no/docs/tilgangsstyring/valg-av-identitetstilbyder/systembruker |
+| Maskinporten                      | https://docs.digdir.no/docs/Maskinporten                                                |
+| Altinn TT02 (test)                | https://tt02.altinn.no                                                                  |
 
 ---
 
 <div align="center">
-<sub>Laget av <b>Fleks-Team Tilgangsstyring</b> i Bekk, for Kartverket</sub>
+<sub>Made by <b>Fleks-Team Tilgangsstyring</b> at Bekk, for Kartverket</sub>
 </div>
