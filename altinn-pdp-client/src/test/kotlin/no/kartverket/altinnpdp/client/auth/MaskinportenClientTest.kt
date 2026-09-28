@@ -39,7 +39,6 @@ class MaskinportenClientTest {
     @AfterTest
     fun stopServer() = server.close()
 
-    /** A client pointed at the test server, on a clock that does not move unless a test moves it. */
     private fun client(clock: Clock = fixedClock(), refreshLeeway: Duration = Duration.ofSeconds(30)) =
         MaskinportenClient(
             maskinportenConfig(tokenUrl = server.baseUrl + TOKEN_PATH),
@@ -133,7 +132,6 @@ class MaskinportenClientTest {
         val cases = mapOf(
             "no expires_in" to (maskinportenTokenResponse(expiresIn = null) to "expires_in"),
             "no access_token" to ("""{"token_type":"Bearer"}""" to "access_token"),
-            // Nothing specific to say about a body that is not JSON, beyond refusing it.
             "a body that is not JSON" to ("<html>gateway error</html>" to ""),
         )
         for ((why, case) in cases) {

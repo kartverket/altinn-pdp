@@ -13,7 +13,6 @@ public data class PdpValidationError(
     val message: String,
 )
 
-/** The formats are Altinn's own, not ours: they reject all of these upstream already. */
 public object PdpRequestValidation {
 
     public val RESOURCE_ID_FORMAT: Regex = Regex("^[a-z0-9_-]{4,}$")

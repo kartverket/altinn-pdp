@@ -8,7 +8,6 @@ public sealed class AltinnPdpException(
 ) : RuntimeException(messageWithBody(message, responseBody), cause) {
 
     private companion object {
-        /** Keeps large error pages out of the logs. */
         private const val MAX_BODY_LENGTH = 500
 
         private fun messageWithBody(message: String, body: String?): String {

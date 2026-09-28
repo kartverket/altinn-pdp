@@ -109,7 +109,6 @@ class ServerTest {
                     FieldError("resourceId", PdpValidationCode.MISSING, "resourceId is required"),
                 ),
             ),
-            // An explicit null is a missing field, not malformed JSON.
             ValidationCase(
                 why = "an explicit null",
                 body = """{"systemuserId":"$SAMPLE_SYSTEMUSER_ID","resourceId":"test-resource",""" +
@@ -137,7 +136,6 @@ class ServerTest {
                     ),
                 ),
             ),
-            // Rejected on the check digit alone, before Altinn is ever called.
             ValidationCase(
                 why = "an organization number with a bad check digit",
                 body = authorizeBody(customerOrganizationNumber = "123456789"),

@@ -27,7 +27,6 @@ internal const val SAMPLE_SYSTEMUSER_ID = "1725580f-70f4-4ace-a748-4f912497a0d7"
 private val testKey: MaskinportenKey =
     MaskinportenKey.parse(RSAKeyGenerator(2048).keyID("test-key").generate().toJSONString())
 
-/** The body every test starts from; a `null` leaves the field out of the JSON entirely. */
 internal fun authorizeBody(
     systemuserId: String? = SAMPLE_SYSTEMUSER_ID,
     resourceId: String? = "test-resource",
@@ -55,7 +54,6 @@ internal suspend fun HttpResponse.authorizeResponse(): AuthorizeResponse =
 internal suspend fun HttpResponse.errorResponse(): ErrorResponse =
     Json.decodeFromString(ErrorResponse.serializer(), bodyAsText())
 
-/** Runs [block] against the routes, with Maskinporten, the token exchange and the PDP faked behind them. */
 internal fun authorizeTest(
     decision: String = "Permit",
     statusCode: Int = 200,
@@ -91,7 +89,6 @@ internal fun authorizeTest(
     block()
 }
 
-/** An unsigned JWT with only an expiry, which is all the client reads from the exchanged token. */
 private fun altinnToken(): String {
     val encoder = Base64.getUrlEncoder().withoutPadding()
     val header = encoder.encodeToString("""{"alg":"none"}""".toByteArray())
@@ -99,7 +96,6 @@ private fun altinnToken(): String {
     return "$header.$claims."
 }
 
-// Copied from a real TT02 answer.
 private fun pdpBody(decision: String, obligations: Boolean): String {
     val obligationsJson = if (obligations) {
         """[{"id":"urn:altinn:obligation:authenticationLevel1","attributeAssignment":[

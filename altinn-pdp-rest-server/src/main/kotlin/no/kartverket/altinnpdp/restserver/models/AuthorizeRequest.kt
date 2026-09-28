@@ -8,7 +8,6 @@ import no.kartverket.altinnpdp.client.SystemUserId
 import no.kartverket.altinnpdp.client.exception.PdpValidationException
 import no.kartverket.altinnpdp.client.validation.PdpRequestValidation
 
-// Nullable so a missing field becomes our own MISSING error instead of a kotlinx parse failure.
 @Serializable
 data class AuthorizeRequest(
     val systemuserId: String? = null,

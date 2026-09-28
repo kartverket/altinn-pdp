@@ -24,7 +24,6 @@ internal fun maskinportenTokenResponse(accessToken: String = "mp-token", expires
         """{"access_token":"$accessToken","token_type":"Bearer","expires_in":$expiresIn}"""
     }
 
-/** Serves the Maskinporten token and the Altinn exchange that follows it, both immediately. */
 internal fun TestHttpServer.serveBothTokens(altinnTokenLifetime: Duration = Duration.ofSeconds(300)) = apply {
     on(TOKEN_PATH) { TestResponse(body = maskinportenTokenResponse()) }
     on(AltinnTokenExchanger.EXCHANGE_PATH) { TestResponse(body = signedJwt(NOW.plus(altinnTokenLifetime))) }

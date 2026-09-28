@@ -1,6 +1,5 @@
 package no.kartverket.altinnpdp.client
 
-/** We never see the caller's token, so obligations are passed out rather than enforced here. */
 public data class PdpObligation(
     val id: String?,
     val category: String,

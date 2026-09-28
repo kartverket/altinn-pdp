@@ -10,7 +10,6 @@ import com.nimbusds.jwt.SignedJWT
 import java.time.Instant
 import java.util.Date
 
-// RSA key generation is slow enough to dominate the suite, so every test shares one key.
 internal object TestKeys {
     val rsa: RSAKey by lazy { RSAKeyGenerator(2048).keyID("test-key").generate() }
 }

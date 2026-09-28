@@ -30,8 +30,6 @@ dependencies {
     testImplementation(libs.nimbus.jose.jwt)
 }
 
-// Local-first Jib config: `./gradlew jibDockerBuild` needs no registry.
-// Override the target image when publishing with `-PdockerImage=<registry>/altinn-pdp-rest-server:<tag>`.
 jib {
     from {
         image = "eclipse-temurin:21-jre"

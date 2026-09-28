@@ -21,7 +21,6 @@ import kotlin.test.assertContains
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
-/** Only timeouts are asserted on: a sleep is a floor, so a slow machine cannot pass these by luck. */
 class PdpClientTimeoutTest {
 
     private lateinit var server: TestHttpServer
@@ -55,7 +54,6 @@ class PdpClientTimeoutTest {
         server.on(authorizePath, slowly(400, TestResponse(body = pdpDecisionResponse())))
         val client = testPdpClient(server.baseUrl)
 
-        // A PdpException here would break the caller's own withTimeout.
         assertFailsWith<TimeoutCancellationException> {
             withTimeout(100) { client.authorizeSample() }
         }

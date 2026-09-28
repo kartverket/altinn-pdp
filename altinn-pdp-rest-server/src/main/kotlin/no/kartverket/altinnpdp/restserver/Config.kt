@@ -2,7 +2,6 @@ package no.kartverket.altinnpdp.restserver
 
 import io.ktor.server.config.ApplicationConfig
 
-// Every value from .env and secrets is read through these, so all are trimmed and errors look the same.
 internal fun ApplicationConfig.optional(path: String): String? =
     propertyOrNull(path)?.getString()?.trim()?.takeIf { it.isNotEmpty() }
 

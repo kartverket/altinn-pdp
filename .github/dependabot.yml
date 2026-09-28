@@ -1,7 +1,5 @@
 version: 2
 updates:
-  # Kotlin/Gradle dependencies (root build.gradle.kts, module build.gradle.kts files,
-  # and gradle/libs.versions.toml).
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:

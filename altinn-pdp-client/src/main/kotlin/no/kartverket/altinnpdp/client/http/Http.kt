@@ -7,7 +7,6 @@ import java.net.URI
 
 internal object Http {
 
-    /** Altinn and Maskinporten answer with more fields than we model. */
     val json = Json { ignoreUnknownKeys = true }
 
     fun url(baseUrl: String, path: String): URI = URI.create(baseUrl.removeSuffix("/") + path)

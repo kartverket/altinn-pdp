@@ -6,10 +6,6 @@ import no.kartverket.altinnpdp.client.OrganizationNumber
 import no.kartverket.altinnpdp.client.ResourceId
 import no.kartverket.altinnpdp.client.SystemUserId
 
-/**
- * The request shape is fixed by Altinn's XACML JSON profile, not by anything in this codebase:
- * https://docs.altinn.studio/nb/authorization/guides/resource-owner/system-user/#autorisasjon-av-systembruker
- */
 @Serializable
 internal data class XacmlAuthorizationRequest(val request: Request) {
 
@@ -38,7 +34,6 @@ internal data class XacmlAuthorizationRequest(val request: Request) {
 
         const val ATTRIBUTE_RESOURCE = "urn:altinn:resource"
 
-        /** A plain Norwegian org number, no ISO6523 prefix. */
         const val ATTRIBUTE_ORGANIZATION_NUMBER = "urn:altinn:organization:identifier-no"
 
         fun forSystemUser(

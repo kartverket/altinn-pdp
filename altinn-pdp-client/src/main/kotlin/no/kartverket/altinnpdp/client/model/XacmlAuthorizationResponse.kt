@@ -4,7 +4,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 
-/** Altinn answers in camelCase; the PascalCase of their documentation is accepted too. */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 internal data class XacmlAuthorizationResponse(

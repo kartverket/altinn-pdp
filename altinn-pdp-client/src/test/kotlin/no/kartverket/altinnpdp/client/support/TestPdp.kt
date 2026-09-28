@@ -22,7 +22,6 @@ internal fun testPdpClient(
     httpClient = httpClient,
 )
 
-/** The one request every PDP test makes, so no test has to spell out four valid arguments. */
 internal suspend fun PdpClient.authorizeSample() =
     authorize(
         SystemUserId.parse(SAMPLE_SYSTEMUSER_ID),
@@ -33,7 +32,6 @@ internal suspend fun PdpClient.authorizeSample() =
 
 internal fun pdpDecisionResponse(decision: String = "Permit") = """{"Response":[{"Decision":"$decision"}]}"""
 
-/** Answers with [response], but only after [millis]. A sleep is a floor, so it cannot pass by luck. */
 internal fun slowly(millis: Long, response: TestResponse): (RecordedRequest) -> TestResponse = {
     Thread.sleep(millis)
     response

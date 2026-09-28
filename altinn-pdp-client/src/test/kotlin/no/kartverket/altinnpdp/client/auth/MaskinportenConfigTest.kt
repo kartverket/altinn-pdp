@@ -11,7 +11,6 @@ class MaskinportenConfigTest {
         val expected = mapOf(
             "https://test.maskinporten.no/token" to "https://test.maskinporten.no/",
             "https://maskinporten.no/token" to "https://maskinporten.no/",
-            // The port is part of the issuer, so it has to survive.
             "http://localhost:8080/token" to "http://localhost:8080/",
         )
         for ((tokenUrl, audience) in expected) {

@@ -6,7 +6,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
 
-/** Takes the request timeout itself, because `java.net.http` can only set it per request. */
 public class JavaPdpHttpClient(
     private val httpClient: HttpClient,
     private val requestTimeout: Duration,
