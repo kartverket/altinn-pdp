@@ -11,3 +11,6 @@ maskinporten:
 
 accessLog:
   enabled: "$?ACCESS_LOG_ENABLED"
+
+logback:
+  configFile: "$?LOGBACK_CONFIG_FILE"

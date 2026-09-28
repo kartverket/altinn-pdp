@@ -70,6 +70,14 @@ class AccessLoggingTest {
     }
 
     @Test
+    fun `the line has its own logger, so logback can route it apart from other logs`() {
+        linesFor("true")
+        val event = appender.list.single { it.formattedMessage.contains("/health/live") }
+
+        assertEquals("access", event.loggerName)
+    }
+
+    @Test
     fun `logs nothing when switched off`() {
         val logged = linesFor("false")
 

@@ -21,6 +21,7 @@ import no.kartverket.altinnpdp.restserver.models.AuthorizeResponse
 
 fun main() {
     val config = YamlConfig("application.yaml") ?: error("application.yaml is not on the classpath")
+    logbackConfigFile(config)?.let { System.setProperty("logback.configurationFile", it) }
     embeddedServer(
         Netty,
         environment = applicationEnvironment { this.config = config },

@@ -29,6 +29,7 @@
   - [Running the server](#running-the-server)
 - [🔌 API](#-api)
 - [🔑 Environment variables](#-environment-variables)
+- [📝 Logging](#-logging)
 - [🌍 Environments](#-environments)
 - [🧪 Testing](#-testing)
 - [🔗 Useful links](#-useful-links)
@@ -293,6 +294,7 @@ API.
 | `ALTINN_SUBSCRIPTION_KEY` | yes      | -       |
 | `ALTINN_ENVIRONMENT`      | no       | `TT02`  |
 | `ACCESS_LOG_ENABLED`      | no       | `true`  |
+| `LOGBACK_CONFIG_FILE`     | no       | -       |
 | `PORT`                    | no       | `8080`  |
 
 See `.env.example` for what each variable is and where to get it.
@@ -303,6 +305,23 @@ startup rather than at the first request. A JVM system property of the same name
 is occasionally handier than an environment variable in an IDE.
 
 Never commit `.env`, and never print secrets in logs.
+
+---
+
+## 📝 Logging
+
+The server logs to stdout through logback, set up by the bundled
+`altinn-pdp-rest-server/src/main/resources/logback.xml`. To replace it, mount your own file and
+point `LOGBACK_CONFIG_FILE` at it. The server refuses to start if that path is not a file.
+
+Access log lines use the logger `access`, so your own file can send them somewhere else, or format
+them differently, from the rest:
+
+```xml
+<logger name="access" additivity="false">
+    <appender-ref ref="ACCESS"/>
+</logger>
+```
 
 ---
 
