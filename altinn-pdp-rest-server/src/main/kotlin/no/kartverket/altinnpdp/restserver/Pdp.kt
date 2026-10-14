@@ -47,8 +47,9 @@ private fun Application.pdpClientFromConfig(): PdpClient {
 internal fun ApplicationConfig.decisionCache(): PdpDecisionCache {
     if (!boolean("decisionCache.enabled", default = false)) return NoPdpDecisionCache
     return InMemoryPdpDecisionCache(
-        timeToLive = Duration.ofSeconds(positiveLong("decisionCache.timeToLiveSeconds", default = 60)),
-        maximumSize = positiveLong("decisionCache.maximumSize", default = 10_000),
+        timeToLive = Duration.ofSeconds(long("decisionCache.timeToLiveSeconds", default = 60, minimum = 1)),
+        defaultMaxAge = Duration.ofSeconds(long("decisionCache.defaultMaxAgeSeconds", default = 0, minimum = 0)),
+        maximumSize = long("decisionCache.maximumSize", default = 10_000, minimum = 1),
     )
 }
 
