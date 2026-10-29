@@ -38,6 +38,10 @@ internal data class XacmlAuthorizationRequest(val request: Request) {
 
         const val ATTRIBUTE_RESOURCE = "urn:altinn:resource"
 
+        const val ATTRIBUTE_GEONORGE = "urn:kv:geonorge"
+
+        const val GEONORGE_DATASET = "dataset"
+
         const val ATTRIBUTE_ORGANIZATION_NUMBER = "urn:altinn:organization:identifier-no"
 
         fun of(
@@ -53,6 +57,7 @@ internal data class XacmlAuthorizationRequest(val request: Request) {
                 resource = listOf(
                     Category.of(
                         Attribute(ATTRIBUTE_RESOURCE, resourceId.value),
+                        Attribute(ATTRIBUTE_GEONORGE, GEONORGE_DATASET),
                         Attribute(ATTRIBUTE_ORGANIZATION_NUMBER, customerOrganizationNumber.value),
                     ),
                 ),
