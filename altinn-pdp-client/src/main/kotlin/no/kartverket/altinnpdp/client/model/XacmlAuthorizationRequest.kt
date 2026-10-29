@@ -36,7 +36,7 @@ internal data class XacmlAuthorizationRequest(val request: Request) {
 
         const val ATTRIBUTE_ACTION_ID = "urn:oasis:names:tc:xacml:1.0:action:action-id"
 
-        const val ATTRIBUTE_RESOURCE = "urn:altinn:resource"
+        const val ATTRIBUTE_RESOURCE = "urn:kv:geonorge"
 
         const val ATTRIBUTE_ORGANIZATION_NUMBER = "urn:altinn:organization:identifier-no"
 

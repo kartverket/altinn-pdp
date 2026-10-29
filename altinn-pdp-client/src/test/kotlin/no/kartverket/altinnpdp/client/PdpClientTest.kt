@@ -56,7 +56,7 @@ class PdpClientTest {
         testPdpClient(server.baseUrl).authorizeSample()
 
         val expected = """
-            {"request":{"returnPolicyIdList":true,"accessSubject":[{"attribute":[{"attributeId":"urn:altinn:systemuser:uuid","value":"$SAMPLE_SYSTEMUSER_ID"}]}],"action":[{"attribute":[{"attributeId":"urn:oasis:names:tc:xacml:1.0:action:action-id","value":"read"}]}],"resource":[{"attribute":[{"attributeId":"urn:altinn:resource","value":"test-resource"},{"attributeId":"urn:altinn:organization:identifier-no","value":"923609016"}]}]}}
+            {"request":{"returnPolicyIdList":true,"accessSubject":[{"attribute":[{"attributeId":"urn:altinn:systemuser:uuid","value":"$SAMPLE_SYSTEMUSER_ID"}]}],"action":[{"attribute":[{"attributeId":"urn:oasis:names:tc:xacml:1.0:action:action-id","value":"read"}]}],"resource":[{"attribute":[{"attributeId":"urn:kv:geonorge","value":"test-resource"},{"attributeId":"urn:altinn:organization:identifier-no","value":"923609016"}]}]}}
         """.trimIndent()
         assertEquals(expected, server.lastRequest(path).body)
     }
@@ -68,7 +68,7 @@ class PdpClientTest {
         testPdpClient(server.baseUrl).authorizeSamplePerson()
 
         val expected = """
-            {"request":{"returnPolicyIdList":true,"accessSubject":[{"attribute":[{"attributeId":"urn:altinn:person:identifier-no","value":"$SAMPLE_PID"}]}],"action":[{"attribute":[{"attributeId":"urn:oasis:names:tc:xacml:1.0:action:action-id","value":"read"}]}],"resource":[{"attribute":[{"attributeId":"urn:altinn:resource","value":"test-resource"},{"attributeId":"urn:altinn:organization:identifier-no","value":"923609016"}]}]}}
+            {"request":{"returnPolicyIdList":true,"accessSubject":[{"attribute":[{"attributeId":"urn:altinn:person:identifier-no","value":"$SAMPLE_PID"}]}],"action":[{"attribute":[{"attributeId":"urn:oasis:names:tc:xacml:1.0:action:action-id","value":"read"}]}],"resource":[{"attribute":[{"attributeId":"urn:kv:geonorge","value":"test-resource"},{"attributeId":"urn:altinn:organization:identifier-no","value":"923609016"}]}]}}
         """.trimIndent()
         assertEquals(expected, server.lastRequest(path).body)
     }
