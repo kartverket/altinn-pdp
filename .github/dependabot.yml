@@ -38,7 +38,7 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      - dependency-name: "dhi.io/eclipse-temurin"
+      - dependency-name: "eclipse-temurin"
         update-types:
           - "version-update:semver-major"
 
