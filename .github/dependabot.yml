@@ -37,6 +37,10 @@ updates:
       - dhi
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "dhi.io/eclipse-temurin"
+        update-types:
+          - "version-update:semver-major"
 
   - package-ecosystem: "docker-compose"
     directory: "/"
