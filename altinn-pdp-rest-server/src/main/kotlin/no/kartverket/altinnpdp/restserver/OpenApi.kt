@@ -13,7 +13,7 @@ private val openApiJson = Json { prettyPrint = true }
 
 private val apiInfo = OpenApiInfo(
     title = "Altinn PDP REST API",
-    version = "v0",
+    version = "v1",
     description = """
         Asks Altinn whether a system user or a person may perform an action on an Altinn resource, on behalf of an
         organisation.
